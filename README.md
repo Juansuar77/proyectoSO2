@@ -68,40 +68,40 @@ module_exit()
 
 
 
-🚀 Compilación
+-- Compilación
 Compilar el módulo:
 make
 Esto generará:
 hello_proc.ko
 
-📥 Cargar el módulo
+-- Cargar el módulo
 sudo insmod hello_proc.ko
 
-📌 Verificar módulo cargado
+-- Verificar módulo cargado
 lsmod | grep hello_proc
 
-📂 Verificar archivo /proc
+-- Verificar archivo /proc
 ls /proc | grep hello_kernel
 
-📖 Leer contenido del archivo /proc
+-- Leer contenido del archivo /proc
 cat /proc/hello_kernel
 Salida esperada:
 Hello World
 
-🧾 Ver mensajes del kernel
+-- Ver mensajes del kernel
 sudo dmesg | tail
 Ejemplo:
 Hello World: modulo cargado
 
-🗑️ Descargar módulo
+-- Descargar módulo
 sudo rmmod hello_proc
 
-✅ Resultado esperado
+-- Resultado esperado
 Después de remover el módulo:
 ls /proc | grep hello_kernel
 No debe mostrar resultados, indicando que el archivo fue eliminado correctamente.
 
-📸 Evidencia experimental
+-- Evidencia experimental
 El proyecto incluye pruebas funcionales utilizando:
 
 
@@ -124,8 +124,10 @@ lectura de /proc
 
 
 
-👨‍💻 Autor
+Autor
 Juan Suar
+
 Ingeniería en Sistemas
+
 Universidad Mariano Gálvez de Guatemala
 
