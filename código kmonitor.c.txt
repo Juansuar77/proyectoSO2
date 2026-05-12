@@ -1,0 +1,150 @@
+código kmonitor.c
+
+#include <linux/module.h>         // Necesario para todos los modulos del kernel
+#include <linux/kernel.h>         // Funciones y macros del kernel
+#include <linux/proc_fs.h>        // Manejo del sistema de archivos /proc
+#include <linux/seq_file.h>       // Interfaz seq_file para lectura segura
+#include <linux/mm.h>             // Funciones relacionadas con memoria
+#include <linux/sched/signal.h>   // Manejo de procesos y task_struct
+#include <linux/sysinfo.h>        // Estructura sysinfo para memoria del sistema
+
+/* Nombre del archivo que se creara en /proc */
+#define PROC_NAME "kmonitor_grupo1"
+
+/* Referencia a la entrada creada en /proc */
+static struct proc_dir_entry *kmonitor_entry;
+
+/* Convierte el estado interno del proceso en un texto legible para el usuario.*/
+static const char *get_state(struct task_struct *task)
+{
+    /* Proceso finalizado que aun existe en tabla */
+    if (task->exit_state & EXIT_ZOMBIE)
+        return "Zombie";
+
+    /* Proceso actualmente ejecutandose */
+    if (task->__state == TASK_RUNNING)
+        return "Running";
+
+    /* Otros estados de espera */
+    return "Sleeping";
+}
+
+/*Funcion principal encargada de mostrar la informacion dentro de /proc/kmonitor_grupo6 */
+static int kmonitor_show(struct seq_file *m, void *v)
+{
+    /* Estructura para informacion de memoria */
+    struct sysinfo si;
+
+    /* Estructura que representa un proceso */
+    struct task_struct *task;
+
+    /* Variables para calculos de memoria */
+    unsigned long long total;
+    unsigned long long free;
+    unsigned long long used;
+
+    /* Obtener informacion de memoria del sistema */
+    si_meminfo(&si);
+
+    /* Calculo de memoria total, libre y utilizada */
+    total = (unsigned long long)si.totalram * si.mem_unit;
+    free  = (unsigned long long)si.freeram * si.mem_unit;
+    used  = total - free;
+
+    /* Mostrar informacion de memoria */
+    seq_printf(m, "========== MEMORIA ==========\n");
+
+    seq_printf(m,
+               "Memoria total: %llu KB\n",
+               total / 1024);
+
+    seq_printf(m,
+               "Memoria libre: %llu KB\n",
+               free / 1024);
+
+    seq_printf(m,
+               "Uso de memoria: %llu%%\n\n",
+               (used * 100) / total);
+
+    /* Encabezado de la tabla de procesos */
+    seq_printf(m,
+               "%-8s %-25s %-12s\n",
+               "PID",
+               "Nombre",
+               "Estado");
+
+    /* Recorre todos los procesos activos usando la macro for_each_process.*/
+    for_each_process(task) {
+
+        seq_printf(m,
+                   "%-8d %-25s %-12s\n",
+                   task->pid,
+                   task->comm,
+                   get_state(task));
+    }
+
+    return 0;
+}
+
+/* Funcion ejecutada cuando el archivo /proc es abierto por el usuario.*/
+
+static int kmonitor_open(struct inode *inode, struct file *file)
+{
+    return single_open(file, kmonitor_show, NULL);
+}
+
+/* Estructura que define las operaciones asociadas al archivo en /proc.*/
+static const struct proc_ops proc_file_ops = {
+
+    .proc_open    = kmonitor_open,
+    .proc_read    = seq_read,
+    .proc_lseek   = seq_lseek,
+    .proc_release = single_release,
+};
+
+/* Funcion de inicializacion del modulo. Se ejecuta al cargar el modulo con insmod.*/
+static int __init kmonitor_init(void)
+{
+    /* Crear entrada en /proc */
+    kmonitor_entry = proc_create(PROC_NAME,
+                                 0444,
+                                 NULL,
+                                 &proc_file_ops);
+
+    /* Verificar si hubo error al crearla */
+    if (!kmonitor_entry) {
+
+        pr_err("KMonitor: error al crear /proc/%s\n",
+               PROC_NAME);
+
+        return -ENOMEM;
+    }
+
+    /* Mensaje visible en dmesg */
+    pr_info("KMonitor: modulo cargado correctamente\n");
+
+    return 0;
+}
+
+/* Funcion de limpieza del modulo. Se ejecuta al remover el modulo con rmmod.*/
+static void __exit kmonitor_exit(void)
+{
+    /* Eliminar entrada creada en /proc */
+    proc_remove(kmonitor_entry);
+
+    /* Mensaje visible en dmesg */
+    pr_info("KMonitor: modulo removido correctamente\n");
+}
+
+/* Registro de funciones principales */
+module_init(kmonitor_init);
+module_exit(kmonitor_exit);
+
+/* Informacion general del modulo */
+MODULE_LICENSE("GPL");
+
+MODULE_AUTHOR("Juan Suar, Jhoselyn López, Josseline Portillo");
+
+MODULE_DESCRIPTION(
+    "Modulo KMonitor para monitoreo de memoria y procesos"
+);

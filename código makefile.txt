@@ -1,0 +1,12 @@
+código makefile
+
+# Nombre del modulo a compilar
+obj-m += kmonitor.o
+
+# Compilar el modulo usando el kernel actual
+all:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+
+# Limpiar archivos generados
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
