@@ -45,10 +45,13 @@ Estructura del proyecto
 tarea1_modulo/│├── hello_proc.c├── Makefile└── README.md
 
 Conceptos utilizados
+
 🔹 Loadable Kernel Module (LKM)
 Los módulos cargables permiten extender funcionalidades del kernel sin reiniciar el sistema operativo.
+
 🔹 Sistema /proc
 /proc es un sistema de archivos virtual utilizado para interactuar con información del kernel y procesos activos.
+
 🔹 Macros del kernel utilizadas
 
 
@@ -126,5 +129,3 @@ Juan Suar
 Ingeniería en Sistemas
 Universidad Mariano Gálvez de Guatemala
 
-📄 Licencia
-Proyecto educativo desarrollado con fines académicos.
