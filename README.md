@@ -50,33 +50,6 @@ Eliminación Segura
 
 Al descargar el módulo mediante rmmod, la entrada creada en /proc es eliminada automáticamente.
 
-Arquitectura de la Solución
-+----------------------+
-|      Usuario         |
-+----------+-----------+
-           |
-           | cat /proc/kmonitor_grupo1
-           |
-+----------v-----------+
-|      Sistema /proc   |
-+----------+-----------+
-           |
-           |
-+----------v-----------+
-|    Módulo KMonitor   |
-+----------+-----------+
-           |
-           |
-+----------v-----------+
-|   Estructuras Kernel |
-|                      |
-| - struct sysinfo     |
-| - task_struct        |
-| - for_each_process   |
-+----------------------+
-Estructuras del Kernel Utilizadas
-struct sysinfo
-
 Permite obtener información sobre la memoria del sistema.
 
 Utilizada mediante:
